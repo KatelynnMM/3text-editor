@@ -2,10 +2,10 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WebpackPwaManifest = require('webpack-pwa-manifest');
 const path = require('path');
 const { InjectManifest } = require('workbox-webpack-plugin');
-
+const isWatchMode = process.argv.includes('--watch');
 // TODO: Add and configure workbox plugins for a service worker and manifest file.
 // TODO: Add CSS loaders and babel to webpack.
-
+console.log(isWatchMode);
 module.exports = () => {
   return {
     mode: 'development',
@@ -20,14 +20,14 @@ module.exports = () => {
     plugins: [
 
       new HtmlWebpackPlugin({
-        template: './src/index.html',
+        template: './index.html',
         chunks: ['main'],
       }),
-      new HtmlWebpackPlugin({
-        template: './src/install.html',
-        filename: 'install.html',
-        chunks: ['install'],
-      }),
+      // new HtmlWebpackPlugin({
+      //   template: './src/js/install.js',
+      //   filename: 'install.js',
+      //   chunks: ['install'],
+      // }),
       new WebpackPwaManifest({
         name: 'Your App Name',
         short_name: 'App Name',
@@ -39,16 +39,21 @@ module.exports = () => {
             src: path.resolve('src/images/logo.png'),
             sizes: [96, 128, 192, 256, 384, 512],
             destination: path.join('icons'),
+
           },
+
         ],
+
+
       }),
-      new InjectManifest({
+
+      !isWatchMode && new InjectManifest({
         swSrc: './src-sw.js',
         swDest: 'sw.js',
       }),
+    ].filter(Boolean), // This ensures that false values are removed from the plugins array
 
 
-    ],
 
     module: {
       rules: [
